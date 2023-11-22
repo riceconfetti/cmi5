@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Introduction to Geology</title>
+    <link rel="stylesheet" href="style/framed.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <div>
+        <h3>What is the 2+3?</h3>
+        <div>
+          <li>
+            <input type="radio" />
+            <label>3</label>
+          </li>
+        </div>
+      </div>
+    
+  </body>
+
+  
+  <script src="js/cmi5.min.js"></script>
+  <script src="js/plugin.js"></script>
+  <script src="js/main.js"></script>
+  <script type="text/javascript">
+    let course;
+
+    (function () {
+      let queryParams = new URLSearchParams(
+        document.location.search.substring(1)
+      );
+      course = new Course({
+        completionBehavior: "quiz",
+        enableBookmarking: true,
+        navigateOnLaunch: true,
+        navigationInjectIntoContent: false,
+        trackingPlugin: new CoursePlugin(),
+      });
+
+      document.addEventListener("click", (e) => {
+        // Capture all exit buttons.
+        if (e.target && e.target.matches(".exit-button")) {
+          course.exit();
+        }
+        // Capture navigation menu item interactions.
+        if (e.target && e.target.matches(".navmenuitem")) {
+          course.gotoPage(e.target.dataset.pageidx);
+        }
+      });
+    })();
+  </script>
+</html>
