@@ -18,45 +18,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Introduction to Geology</title>
-    <link rel="stylesheet" href="style/framed.css">
+    <link rel="stylesheet" href="style/base.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
-<div id="container" class="container">
-    <div id="design" class="design">
-        <div id="info-bar" class="info-bar">
-            Read-only mode, no data will be saved.
+<div class="main">
+    <div id="info-bar" class="info-bar">
+        Read-only mode, no data will be saved.
+    </div>
+    <div id="navigation" class="navigation">
+        <div class="navcorner" style="background-image: url('img/strata1.jpg')">
+            <div class="navtitle">Introduction to Geology</div>
         </div>
-        <div class="header" role="banner">
-            <div class="header-title">Introduction to Geology</div>
-            <div class="header-buttons">
-                <div class="navexit">
-                    <button class="exit-button">Exit</button>
-                </div>
-            </div>
+        <div class="navmenu" id="navmenu">
+            <ul id="navmenuitems">
+            </ul>
         </div>
-        <div class="center">
-            <div class="navigation" role="navigation">
-                <div class="navmenu" id="navmenu">
-                    <ul id="navmenuitems">
-                    </ul>
-                </div>
-            </div>
-            <div id="content" class="content" role="main">
-                <!-- Content will be loaded in here. -->
-            </div>
+        <div class="footer-progress">Progress (resets every launch): <span id="footer-progress-value" class="footer-progress-value">0</span>%</div>
+
+        <div class="navexit">
+            <button class="exit-button">Exit</button>
         </div>
-        <div class="footer">
-            <div id="warning-icon" class="warning-icon" onclick="course.showErrorPanel()">
-                <div class="warning-icon-container">&#x26A0;</div>
-            </div>
-            <div class="footer-title">&nbsp;</div>
-            <div class="footer-progress">Progress (resets every launch): <span id="footer-progress-value" class="footer-progress-value">0</span>%</div>
-            <div class="footer-buttons">
-                <button id="prev">&laquo; Previous</button>
-                <button id="next">Next &raquo;</button>
-            </div>
+    </div>
+    <div id="content" class="content">
+        <!-- Content will be loaded in here. -->
+    </div>
+
+    <div class="navtoggle">
+        &#x2630;
+    </div>
+    <div id="warning-floater" class="warning-floater">
+        <div id="warning-icon" class="warning-icon" onclick="course.showErrorPanel()">
+            <div class="warning-icon-container">&#x26A0;</div>
         </div>
     </div>
 
@@ -611,28 +605,29 @@
 
 <script src="js/cmi5.min.js"></script>
 <script src="js/course_cmi5.js"></script>
+
 <script src="js/course.js"></script>
 <script type="text/javascript">
     let course;
 
-    (function () {
+    (function() {
         let queryParams = new URLSearchParams(document.location.search.substring(1));
         course = new Course({
 
             completionBehavior: "quiz",
             enableBookmarking: true,
             navigateOnLaunch: true,
-            navigationInjectIntoContent: false,
+            navigationInjectIntoContent: true,
             trackingPlugin: new CourseCmi5Plugin()
         });
 
-        document.getElementById("next").addEventListener("click", () => {
-            course.nextPage();
-        });
-        document.getElementById("prev").addEventListener("click", () => {
-            course.previousPage();
-        });
         document.addEventListener("click", e => {
+            if (e.target && e.target.matches(".footerbar")) {
+                course.nextPage();
+            }
+            if (e.target && e.target.matches(".homebar")) {
+                course.previousPage();
+            }
             // Capture all exit buttons.
             if (e.target && e.target.matches(".exit-button")) {
                 course.exit();
@@ -641,55 +636,12 @@
             if (e.target && e.target.matches(".navmenuitem")) {
                 course.gotoPage(e.target.dataset.pageidx);
             }
+            // Toggle the navigation panel in certain views.
+            if (e.target && e.target.matches(".navtoggle")) {
+                document.getElementById('navigation').classList.toggle('visible-narrow');
+            }
         });
     })();
-</script>
-
-<script type="text/javascript">
-    /* Resizing code start. */
-    let pageWidth = 800,
-        pageHeight = 600,
-        basePage = {
-            width: 800,
-            height: 600,
-            scale: 1,
-            scaleX: 1,
-            scaleY: 1
-        };
-
-    const $page = document.getElementById('design');
-    const $container = document.getElementById('container');
-
-    getPageSize();
-    scalePages($page, pageWidth, pageHeight);
-
-    //using underscore to delay resize method till finished resizing window
-    window.addEventListener("resize", function () {
-        getPageSize();
-        scalePages($page, pageWidth, pageHeight);
-    });
-
-    function getPageSize() {
-        pageHeight = $container.clientHeight;
-        pageWidth = $container.clientWidth;
-    }
-
-    function scalePages(page, maxWidth, maxHeight) {
-        let scaleX = 1, scaleY = 1;
-        scaleX = maxWidth / basePage.width;
-        scaleY = maxHeight / basePage.height;
-        basePage.scaleX = scaleX;
-        basePage.scaleY = scaleY;
-        basePage.scale = (scaleX > scaleY) ? scaleY : scaleX;
-
-        const newLeftPos = Math.abs(Math.floor(((basePage.width * basePage.scale) - maxWidth) / 2));
-        const newTopPos = Math.abs(Math.floor(((basePage.height * basePage.scale) - maxHeight) / 2));
-
-        page.style.transform = "scale(" + basePage.scale + ")";
-        page.style.left = newLeftPos + 'px';
-        page.style.top = newTopPos + 'px';
-    }
-    /* Resizing code end */
 </script>
 </body>
 </html>
