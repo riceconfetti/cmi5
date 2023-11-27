@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <courseStructure xmlns="https://w3id.org/xapi/profiles/cmi5/v1/CourseStructure.xsd">
-    <course id="https://test-courses-o3o6.onrender.com/">
+    <course id="https://test-courses-o3o6.onrender.com">
         <title>
-            <langstring lang="en-US">Introduction to Geology - Responsive Style</langstring>
+            <langstring lang="en-US">Introduction to Geology - Framed Style</langstring>
         </title>
         <description>
             <langstring lang="en-US">
@@ -11,10 +11,9 @@
             </langstring>
         </description>
     </course>
-    <au id="https://test-courses-o3o6.onrender.com/1"
-        moveOn="CompletedOrPassed">
+    <au id="https://test-courses-o3o6.onrender.com/geology">
         <title>
-            <langstring lang="en-US">Introduction to Geology - Responsive Style</langstring>
+            <langstring lang="en-US">Introduction to Geology - Framed Style</langstring>
         </title>
         <description>
             <langstring lang="en-US">
