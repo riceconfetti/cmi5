@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <courseStructure xmlns="https://w3id.org/xapi/profiles/cmi5/v1/CourseStructure.xsd">
-    <course id="https://w3id.org/xapi/cmi5/catapult/lts/course/geology-intro-single-au-basic-responsive">
+    <course id="https://test-courses-o3o6.onrender.com/">
         <title>
             <langstring lang="en-US">Introduction to Geology - Responsive Style</langstring>
         </title>
@@ -11,7 +11,7 @@
             </langstring>
         </description>
     </course>
-    <au id="https://w3id.org/xapi/cmi5/catapult/lts/course/geology-intro-single-au-basic-responsive/1"
+    <au id="https://test-courses-o3o6.onrender.com/"
         moveOn="CompletedOrPassed">
         <title>
             <langstring lang="en-US">Introduction to Geology - Responsive Style</langstring>
