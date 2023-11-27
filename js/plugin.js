@@ -243,4 +243,53 @@ CoursePlugin.prototype.experienced = function (pageId, name, overallProgress) {
   return this.sendStatement(stmt);
 };
 
+CoursePlugin.prototype.captureInteractions = function (interactionList, opts) {
+  if (!this.cmi5) {
+    return Promise.resolve(null);
+  }
 
+  if (!opts) {
+    opts = {};
+  }
+
+  if (!opts.hasOwnProperty("queue")) {
+    opts.queue = false;
+  }
+
+  let stmts = [];
+  interactionList.forEach((interactionObj) => {
+    let stmt = this.cmi5.prepareStatement(VERB_ANSWERED);
+    stmt.result = {
+      response: interactionObj.userAnswers.join("[,]"),
+    };
+    if (typeof interactionObj.success !== "undefined") {
+      stmt.result.success = !!interactionObj.success;
+    }
+    stmt.object = {
+      objectType: "Activity",
+      id:
+        this.cmi5.getActivityId() +
+        "/test/" +
+        interactionObj.testID +
+        "/question/" +
+        interactionObj.interactionId, //Demo Course Specific, will need to adjust for IMI/GFEBS courses
+      definition: {
+        type: "http://adlnet.gov/expapi/activities/cmi.interaction",
+        interactionType: interactionObj.interactionType,
+        name: { "en-US": interactionObj.name },
+        correctResponsesPattern: [interactionObj.correctAnswers.join("[,]")],
+      },
+    };
+
+    if (interactionObj.description) {
+      stmt.object.definition.description = {
+        "en-US": interactionObj.description,
+      };
+    }
+    if (interactionObj.choices) {
+      stmt.object.definition.choices = interactionObj.choices;
+    }
+    stmts.push(stmt);
+  });
+  return this.sendStatements(stmts, opts);
+};
