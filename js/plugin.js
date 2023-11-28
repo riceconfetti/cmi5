@@ -243,6 +243,7 @@ CoursePlugin.prototype.experienced = function (pageId, name, overallProgress) {
   return this.sendStatement(stmt);
 };
 
+//Quiz Interactions
 CoursePlugin.prototype.captureInteractions = function (interactionList, opts) {
   if (!this.cmi5) {
     return Promise.resolve(null);
@@ -293,3 +294,118 @@ CoursePlugin.prototype.captureInteractions = function (interactionList, opts) {
   });
   return this.sendStatements(stmts, opts);
 };
+
+CoursePlugin.prototype._shouldSendStatement = function (opts) {
+  if (!opts) {
+    opts = {};
+  }
+  if (!opts.forceSend) {
+    opts.forceSend = false;
+  }
+  return this.launchMode.toLowerCase() == "normal" || opts.forceSend;
+};
+
+CoursePlugin.prototype.flushBatch = function () {
+  return this._sendStatements(this.statementBatch);
+};
+
+CoursePlugin.prototype.batchStatement = function (statement, opts) {
+  this.statementBatch.push(statement);
+  return Promise.resolve(null);
+};
+
+CoursePlugin.prototype.batchStatements = function (statements, opts) {
+  this.statementBatch = this.statementBatch.concat(statements);
+  return Promise.resolve(null);
+};
+
+CoursePlugin.prototype.sendStatement = function (statement, opts) {
+  if (!opts) {
+    opts = {};
+  }
+  if (!opts.forceSend) {
+    opts.forceSend = false;
+  }
+  if (!opts.hasOwnProperty("queue")) {
+    opts.queue = false;
+  }
+  // forceSend sends the statement even if we're in browse/review mode.  Normally should only be used
+  // for initialized/terminated statements.
+  if (this._shouldSendStatement(opts)) {
+    if (opts.queue) {
+      return this.batchStatement(statement, opts);
+    } else {
+      return this._sendStatement(statement);
+    }
+  }
+  return Promise.resolve(null);
+};
+
+CoursePlugin.prototype.sendStatements = function (statements, opts) {
+  if (!opts) {
+    opts = {};
+  }
+  if (!opts.forceSend) {
+    opts.forceSend = false;
+  }
+  if (!opts.hasOwnProperty("queue")) {
+    opts.queue = false;
+  }
+
+  if (this._shouldSendStatement(opts)) {
+    if (opts.queue) {
+        return this.batchStatements(statements, opts);
+    } else {
+        return this._sendStatements(statements);
+    }
+}
+return Promise.resolve(null);
+};
+
+CoursePlugin.prototype._sendStatement = function (statement) {
+  this.activeStatements += 1;
+  this.callbackOnStatementSend(null, null, this.activeStatements);
+  return this.cmi5.sendStatement(statement).then(result => {
+    this.activeStatements -= 1;
+    if (this.callbackOnStatementSend) {
+      this.callbackOnStatementSend(result, null, this.activeStatements);
+    }
+  }).catch(error=> {
+    this.activeStatements -= 1;
+    if (this.callbackOnStatementSend) {
+      this.callbackOnStatementSend(null,error, this.activeStatements);
+    }
+  })
+}
+
+CoursePlugin.prototype._sendStatements = function (statements) {
+  this.activeStatements += 1;
+  this.callbackOnStatementSend(null, null, this.activeStatements);
+  return this.cmi5.sendStatements(statements).then(result => {
+    this.activeStatements -= 1;
+    if (this.callbackOnStatementSend) {
+      this.callbackOnStatementSend(result, null, this.activeStatements);
+    }
+  }).catch(error => {
+    this.activeStatements -= 1;
+    if (this.callbackOnStatementSend) {
+      this.callbackOnStatementSend(null, error, this.activeStatements);
+    }
+  })
+}
+
+CoursePlugin.prototype._sendStatementViaLibFunction = function (statementFn) {
+  this.activeStatements += 1;
+  this.callbackOnStatementSend(null, null, this.activeStatements);
+  return statementFn().then(result => {
+    this.activeStatements -= 1;
+    if (this.callbackOnStatementSend) {
+      this.callbackOnStatementSend(result, null, this.activeStatements);
+    }
+  }).catch(error => {
+    this.activeStatements -= 1;
+    if (this.callbackOnStatementSend) {
+      this.callbackOnStatementSend(null, error, this.activeStatements);
+    }
+  })
+}
